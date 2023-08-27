@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -36,42 +37,53 @@ type Response struct {
 }
 
 func main() {
-	http.HandleFunc("/cotacao/", handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/cotacao", handler)
+	port := ":8080"
+	fmt.Printf("Server listening on port %s...\n", port)
+	err := http.ListenAndServe(port, nil)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	req, err := http.NewRequest(http.MethodGet, "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
-	if err != nil {
-		log.Fatal(err)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 
-	ctx, cancel := context.WithTimeout(req.Context(), time.Duration(time.Millisecond*200))
+	client := &http.Client{Transport: tr, Timeout: 10 * time.Second}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*2000))
 	defer cancel()
-	req = req.WithContext(ctx)
-	c := &http.Client{}
-	res, err := c.Do(req)
+
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error creating request:", err)
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Println("Error making request:", err)
 	}
 	defer res.Body.Close()
 
 	_, err = io.WriteString(w, getBid(*res))
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error getting bid:", err)
 	}
 }
 
 func getBid(response http.Response) string {
 	decoder := json.NewDecoder(response.Body)
 	var data Cambio
-	decoder.Decode(&data)
+	err := decoder.Decode(&data)
+	if err != nil {
+		fmt.Println("Error decoding data:", err)
+	}
 
 	var responseValue Response
 
-	os.Remove("../database/cotacao.db")
-
-	db, err := sql.Open("sqlite3", "../database/cotacao.db")
+	db, err := sql.Open("sqlite3", "./database/cotacao.db")
 	if err != nil {
 		log.Fatal(err)
 	}
