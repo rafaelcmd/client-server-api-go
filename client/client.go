@@ -17,7 +17,7 @@ func main() {
 	}
 	client := &http.Client{Transport: tr, Timeout: 10 * time.Second}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*3000))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*300))
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "http://server:8080/cotacao", nil)

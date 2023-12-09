@@ -53,7 +53,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	client := &http.Client{Transport: tr, Timeout: 10 * time.Second}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*2000))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*200))
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
