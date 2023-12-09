@@ -10,7 +10,4 @@ RUN apt-get update && apt-get install sqlite3 -y
 RUN ["chmod", "+x", "./server"]
 RUN mkdir database
 
-#FROM scratch
-#COPY --from=builder /app/server ./
-
 CMD [ "./server" ]
