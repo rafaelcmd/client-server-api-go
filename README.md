@@ -1,40 +1,57 @@
-# Dockerized Client-Server Application
+# Go Client-Server Application
 
-## Building Container Images
+This is a basic example of a client-server application written in Go. The application consists of two parts: the server and the client.
 
-To build the container images, use the following commands:
+## Server
 
-```bash
-docker build -t server:latest -f Dockerfile.Server .
-docker build -t client:latest -f Dockerfile.Client .
-```
+### Prerequisites
 
-## Creating a Docker Network
+- Go (Golang) installed on your machine.
 
-To create a Docker network for communication between server and client containers:
+### How to Run
 
-```bash
-docker network create client-server-network
-```
+1. Open a terminal and navigate to the "server" folder:
 
-## Running the Containers
+    ```bash
+    cd path/to/your/app/server
+    ```
 
-To run the server container:
+2. Run the server:
 
-```bash
-docker run --name server -p 8080:8080 --network client-server-network server
-```
+    ```bash
+    go run main.go
+    ```
 
-To run the client container:
+3. The server will start and wait for incoming connections.
 
-```bash
-docker run --name client --network client-server-network --volume ./file:/app/file client
-```
+## Client
 
-## Running the Client Multiple Times
+### Prerequisites
 
-If you need to run the client container more than once:
+- Go (Golang) installed on your machine.
 
-```bash
-docker start client
-```
+### How to Run
+
+1. Open another terminal and navigate to the "client" folder:
+
+    ```bash
+    cd path/to/your/app/client
+    ```
+
+2. Run the client:
+
+    ```bash
+    go run main.go
+    ```
+
+3. The client will connect to the server and generate the dollar exchange rate.
+
+## Notes
+
+- The server listens on `127.0.0.1:8080` by default. You can modify the code to use a different address or port if needed.
+
+- This is a basic example and serves as a starting point. Feel free to modify and extend the code based on your specific requirements.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

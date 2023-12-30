@@ -83,10 +83,11 @@ func getBid(response http.Response) string {
 
 	var responseValue Response
 
-	db, err := sql.Open("sqlite3", "./database/cotacao.db")
+	db, err := sql.Open("sqlite3", "../cotacao.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
 	sqlCreateTable := `CREATE TABLE dolar(currentValue REAL);`
 

@@ -20,7 +20,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*300))
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", "http://server:8080/cotacao", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/cotacao", nil)
 	if err != nil {
 		fmt.Println("Error creating request:", err)
 	}
@@ -34,7 +34,7 @@ func main() {
 	body, err := io.ReadAll(res.Body)
 	cotacao := []byte("Dólar: " + string(body[:]))
 
-	err = os.WriteFile("/app/file/cotacao", cotacao, 0666)
+	err = os.WriteFile("../cotacao", cotacao, 0666)
 	if err != nil {
 		panic(err)
 	}
