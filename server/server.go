@@ -67,13 +67,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer res.Body.Close()
 
-	_, err = io.WriteString(w, getBid(*res))
+	bid, err := getBid(*res)
 	if err != nil {
 		fmt.Println("Error getting bid:", err)
 	}
+
+	_, err = io.WriteString(w, bid)
+	if err != nil {
+		log.Println("Error writing response:", err)
+	}
 }
 
-func getBid(response http.Response) string {
+func getBid(response http.Response) (string, error) {
 	decoder := json.NewDecoder(response.Body)
 	var data Cambio
 	err := decoder.Decode(&data)
@@ -104,6 +109,7 @@ func getBid(response http.Response) string {
 	_, err = db.ExecContext(ctx, sqlInsertCurrentValue, data.USDBRL.Bid)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlInsertCurrentValue)
+		return "", err
 	}
 
 	value, err := db.Query("SELECT * FROM dolar")
@@ -119,5 +125,5 @@ func getBid(response http.Response) string {
 		responseValue.Value = dol
 	}
 
-	return responseValue.Value
+	return responseValue.Value, nil
 }
